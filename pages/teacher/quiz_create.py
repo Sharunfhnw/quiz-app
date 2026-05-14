@@ -115,6 +115,3 @@ def quiz_create(teacher_id: int):
             'width: 100%; background-color: #6B3FA0; color: white; '
             'border-radius: 8px; font-size: 13px; margin-top: 8px'
         )
-
-    ui.notify('Quiz gespeichert!', color='positive')
-    ui.navigate.to('/teacher/dashboard')
