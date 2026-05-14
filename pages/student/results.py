@@ -1,7 +1,7 @@
 from nicegui import ui
 from sqlmodel import select
 from data_access.db import Database
-from domain.models import QuizAttempt, Quiz
+from domain.models import QuizAttempt, Quiz, StudentAnswer, Question, AnswerOption
 
 
 def results_page(attempt_id: int):
@@ -26,6 +26,25 @@ def results_page(attempt_id: int):
         else:
             msg = 'Weiter ueben! 💪'
         ui.label(msg)
+
+    sa_list = session.exec(
+        select(StudentAnswer).where(
+            StudentAnswer.attempt_id == attempt_id
+        )
+    ).all()
+
+    for sa in sa_list:
+        q = session.get(Question, sa.question_id)
+        opt = session.get(
+            AnswerOption, sa.selected_answer_option_id
+        )
+        with ui.card().classes('w-full mb-1'):
+            ui.label(q.text).classes('font-bold')
+            color = 'text-green-600' if sa.is_correct \
+                else 'text-red-600'
+            ui.label(
+                f'Deine Antwort: {opt.text}'
+            ).classes(color)
 
     ui.button(
         'Zurueck zum Dashboard',
