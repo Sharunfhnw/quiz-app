@@ -61,12 +61,42 @@ def quiz_create(teacher_id: int):
 
 
 def save_quiz(teacher_id: int, session, title: str, description: str, questions: list):
+    if not title:
+        ui.notify('Titel erforderlich!', color='negative')
+        return
+
+    if not questions:
+        ui.notify('Mind. 1 Frage erforderlich!', color='negative')
+        return
+
     quiz = Quiz(
         title=title,
         description=description,
         teacher_id=teacher_id,
+        is_published=False,
     )
     session.add(quiz)
     session.commit()
+
+    correct_map = {
+        'Option 1': 0, 'Option 2': 1, 'Option 3': 2, 'Option 4': 3
+    }
+
+    for q in questions:
+        question = Question(text=q['text'], quiz_id=quiz.id)
+        session.add(question)
+        session.commit()
+
+        for index, option in enumerate(q['options']):
+            if not option:
+                continue
+            is_correct = index == correct_map.get(q['correct'], -1)
+            session.add(AnswerOption(
+                text=option,
+                is_correct=is_correct,
+                question_id=question.id,
+            ))
+        session.commit()
+
     ui.notify('Quiz gespeichert!', color='positive')
     ui.navigate.to('/teacher/dashboard')
