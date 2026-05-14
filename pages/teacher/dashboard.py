@@ -83,8 +83,7 @@ def teacher_dashboard(teacher_id: int):
                                 'border-radius: 5px; font-size: 12px'
                             )
                         ui.button('Resultate',
-                            on_click=lambda q=quiz:
-                                ui.navigate.to(f'/teacher/results/{q.id}')
+                            on_click=lambda *_: ui.navigate.to(f'/teacher/results/{quiz.id}')
                         ).style(
                             'background: transparent; border: 1px solid #ccc; '
                             'border-radius: 5px; font-size: 12px'

@@ -90,16 +90,18 @@ def quiz_create(teacher_id: int):
             if not questions:
                 ui.notify('Mind. 1 Frage erforderlich!', color='negative')
                 return
-            quiz = Quiz(title=title.value,
-                       description=description.value,
-                       teacher_id=teacher_id, is_published=False)
+            quiz = Quiz(title=title.value or '',
+                           description=description.value or '',
+                           teacher_id=teacher_id, is_published=False)
             session.add(quiz)
             session.commit()
+                assert quiz.id is not None
             cm = {'Option 1':0,'Option 2':1,'Option 3':2,'Option 4':3}
             for q in questions:
                 question = Question(text=q['text'], quiz_id=quiz.id)
                 session.add(question)
                 session.commit()
+                    assert question.id is not None
                 for i, opt in enumerate(q['options']):
                     if not opt: continue
                     session.add(AnswerOption(
