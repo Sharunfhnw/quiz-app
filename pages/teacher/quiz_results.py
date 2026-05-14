@@ -47,15 +47,14 @@ def quiz_results(quiz_id: int):
                     'font-size: 24px; font-weight: 500'
                 )
                 ui.label('Versuche').style('font-size: 12px; color: #666')
-
-        with ui.card().style(
-            'width: 100%; padding: 16px; border-radius: 10px; '
-            'text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06)'
-        ):
-            ui.label(f'{avg:.0f}%').style(
-                'font-size: 24px; font-weight: 500; color: #3B6D11'
-            )
-            ui.label('Durchschnitt').style('font-size: 12px; color: #666')
+            with ui.card().style(
+                'flex: 1; padding: 16px; border-radius: 10px; '
+                'text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06)'
+            ):
+                ui.label(f'{avg:.0f}%').style(
+                    'font-size: 24px; font-weight: 500; color: #3B6D11'
+                )
+                ui.label('Durchschnitt').style('font-size: 12px; color: #666')
 
         with ui.card().style(
             'width: 100%; padding: 16px; border-radius: 10px; '
