@@ -1,4 +1,4 @@
- from sqlmodel import create_engine, SQLModel, Session
+from sqlmodel import create_engine, SQLModel, Session
 class Database:
     def __init__(self, url: str = 'sqlite:///quiz.db'):
         self.engine = create_engine(url)
