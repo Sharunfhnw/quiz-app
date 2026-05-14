@@ -18,6 +18,36 @@ def quiz_create(teacher_id: int):
         ui.label('Fragen').classes('font-bold mb-2')
         ui.label('Noch keine Fragen hinzugefügt.')
 
+    with ui.card().classes('w-full mb-4'):
+        ui.label('Frage hinzufügen').classes('font-bold mb-2')
+        q_text = ui.input('Frage')
+        opt1 = ui.input('Option 1')
+        opt2 = ui.input('Option 2')
+        opt3 = ui.input('Option 3')
+        opt4 = ui.input('Option 4')
+        correct = ui.select(
+            label='Richtige Antwort',
+            options=['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+        )
+        q_list = ui.column()
+
+        def add_question():
+            if not q_text.value:
+                ui.notify('Bitte Frage eingeben!', color='negative')
+                return
+            questions.append({
+                'text': q_text.value,
+                'options': [opt1.value, opt2.value, opt3.value, opt4.value],
+                'correct': correct.value,
+            })
+            with q_list:
+                ui.label(f'Frage {len(questions)}: {q_text.value}')
+            ui.notify('Frage hinzugefügt!', color='positive')
+            q_text.value = opt1.value = opt2.value = ''
+            opt3.value = opt4.value = ''
+
+        ui.button('Frage hinzufügen', on_click=add_question)
+
     ui.button(
         'Quiz speichern',
         on_click=lambda: save_quiz(
