@@ -9,6 +9,7 @@ class User(SQLModel, table=True):
     role: str  # 'teacher' oder 'student'
 
 
+
     class Quiz(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
@@ -19,6 +20,7 @@ class Question(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str
     quiz_id: int = Field(foreign_key='quiz.id')
+
 
 
     class AnswerOption(SQLModel, table=True):
@@ -41,6 +43,7 @@ class StudentAnswer(SQLModel, table=True):
     is_correct: bool
 
 
+
     from sqlmodel import create_engine, SQLModel, Session
 class Database:
     def __init__(self, url: str = 'sqlite:///quiz.db'):
@@ -53,6 +56,7 @@ class Database:
     def get_session(self):
         return Session(self.engine)
     
+
 
     import hashlib
 from sqlmodel import Session, select
@@ -79,6 +83,7 @@ def seed_data(session: Session) -> None:
     session.add(schueler)
     session.commit()
     print('Demo-User erstellt!')
+
 
 
      # Demo-Quiz 1: Mathematik
@@ -122,3 +127,33 @@ def seed_data(session: Session) -> None:
     print('Demo-Quizze erstellt!')
 
 
+
+from sqlmodel import Session, select
+from domain.models import User, Quiz, Question
+from domain.models import AnswerOption, QuizAttempt, StudentAnswer
+class UserDAO:
+    def __init__(self, session: Session):
+        self.session = session
+    def get_by_username(self, username: str):
+        return self.session.exec(
+            select(User).where(User.username == username)
+        ).first()
+    def save(self, user: User) -> User:
+        self.session.add(user)
+        self.session.commit()
+        return user
+class QuizDAO:
+    def __init__(self, session: Session):
+        self.session = session
+    def get_published(self):
+        return self.session.exec(
+            select(Quiz).where(Quiz.is_published == True)
+        ).all()
+    def get_by_teacher(self, teacher_id: int):
+        return self.session.exec(
+            select(Quiz).where(Quiz.teacher_id == teacher_id)
+        ).all()
+    def save(self, quiz: Quiz) -> Quiz:
+        self.session.add(quiz)
+        self.session.commit()
+        return quiz
