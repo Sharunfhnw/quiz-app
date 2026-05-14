@@ -39,8 +39,8 @@ def test_quiz_speichern(session):
         username='lehrer1',
         email='l@t.ch',
         password_hash=hashlib.sha256(b'p').hexdigest(),
-    )
         role='teacher'
+    )
     session.add(user)
     session.commit()
     quiz = Quiz(

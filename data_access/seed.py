@@ -1,4 +1,4 @@
-    import hashlib
+import hashlib
 from sqlmodel import Session, select
 from domain.models import User, Quiz, Question, AnswerOption
 def hash_password(password: str) -> str:

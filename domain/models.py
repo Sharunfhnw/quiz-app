@@ -10,7 +10,7 @@ class User(SQLModel, table=True):
 
 
 
-    class Quiz(SQLModel, table=True):
+class Quiz(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
     description: str
@@ -23,7 +23,7 @@ class Question(SQLModel, table=True):
 
 
 
-    class AnswerOption(SQLModel, table=True):
+class AnswerOption(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str
     is_correct: bool
