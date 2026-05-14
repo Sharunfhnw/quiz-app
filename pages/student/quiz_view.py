@@ -55,6 +55,15 @@ def quiz_view(quiz_id: int, student_id: int):
                 answers[question.id] = selected
 
         def submit_quiz():
+            # Prüfen ob alle Fragen beantwortet wurden
+            for question in questions:
+                if answers[question.id].value is None:
+                    ui.notify(
+                        'Bitte alle Fragen beantworten!',
+                        color='negative'
+                    )
+                    return
+
             score = 0
             attempt = QuizAttempt(
                 student_id=student_id,
