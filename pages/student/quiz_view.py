@@ -29,3 +29,37 @@ def quiz_view(quiz_id: int, student_id: int):
                 value=None
             )
             answers[question.id] = selected
+
+    def submit_quiz():
+        score = 0
+        attempt = QuizAttempt(
+            student_id=student_id,
+            quiz_id=quiz_id,
+            score=0,
+            max_score=len(questions)
+        )
+        session.add(attempt)
+        session.commit()
+
+        for question in questions:
+            sel_id = answers[question.id].value
+            opt = session.get(AnswerOption, sel_id)
+            ok = opt.is_correct if opt else False
+            if ok:
+                score += 1
+            session.add(StudentAnswer(
+                attempt_id=attempt.id,
+                question_id=question.id,
+                selected_answer_option_id=sel_id,
+                is_correct=ok
+            ))
+
+        attempt.score = score
+        session.add(attempt)
+        session.commit()
+        ui.navigate.to(f'/student/results/{attempt.id}')
+
+    ui.button(
+        'Quiz abgeben',
+        on_click=submit_quiz
+    ).classes('w-full mt-4')
