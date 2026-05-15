@@ -19,7 +19,13 @@ class QuizApplication:
     ) -> None:
         """NiceGUI App starten"""
         self.pages.register()
-        ui.run(host=host, port=port, reload=reload)
+        ui.run(
+            host=host,
+            port=port,
+            reload=reload,
+            storage_secret='quiz_app_secret_key'
+        )
+
 
 if __name__ == '__main__':
     QuizApplication().run()
