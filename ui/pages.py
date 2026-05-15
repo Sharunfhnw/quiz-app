@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, app
 
 
 class Pages:
@@ -8,7 +8,6 @@ class Pages:
     def register(self):
         """Alle Routen registrieren"""
 
-        # Login und Registrierung
         @ui.page('/')
         def login():
             from pages.login import login_page
@@ -23,12 +22,14 @@ class Pages:
         @ui.page('/teacher/dashboard')
         def teacher_dashboard():
             from pages.teacher.dashboard import teacher_dashboard
-            teacher_dashboard(teacher_id=1)
+            teacher_id = app.storage.user.get('user_id', 1)
+            teacher_dashboard(teacher_id=teacher_id)
 
         @ui.page('/teacher/create')
         def teacher_create():
             from pages.teacher.quiz_create import quiz_create
-            quiz_create(teacher_id=1)
+            teacher_id = app.storage.user.get('user_id', 1)
+            quiz_create(teacher_id=teacher_id)
 
         @ui.page('/teacher/results/{quiz_id}')
         def teacher_results(quiz_id: int):
@@ -44,7 +45,8 @@ class Pages:
         @ui.page('/student/quiz/{quiz_id}')
         def student_quiz(quiz_id: int):
             from pages.student.quiz_view import quiz_view
-            quiz_view(quiz_id=quiz_id, student_id=1)
+            student_id = app.storage.user.get('user_id', 1)
+            quiz_view(quiz_id=quiz_id, student_id=student_id)
 
         @ui.page('/student/results/{attempt_id}')
         def student_results(attempt_id: int):
