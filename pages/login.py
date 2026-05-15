@@ -1,5 +1,5 @@
 import hashlib
-from nicegui import ui
+from nicegui import ui, app
 from sqlmodel import select
 from data_access.db import Database
 from domain.models import User
@@ -41,8 +41,14 @@ def login_page():
                     )
                 ).first()
                 if user and user.role == 'teacher':
+                    app.storage.user['user_id'] = user.id
+                    app.storage.user['username'] = user.username
+                    app.storage.user['role'] = user.role
                     ui.navigate.to('/teacher/dashboard')
                 elif user and user.role == 'student':
+                    app.storage.user['user_id'] = user.id
+                    app.storage.user['username'] = user.username
+                    app.storage.user['role'] = user.role
                     ui.navigate.to('/student/dashboard')
                 else:
                     ui.notify('Login fehlgeschlagen!', color='negative')
