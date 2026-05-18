@@ -45,47 +45,66 @@ def teacher_dashboard(teacher_id: int):
             ui.label('Noch keine Quizze erstellt').style('color: #666')
             return
 
-        for quiz in quizze:
-            with ui.card().style(
-                'width: 100%; margin-bottom: 10px; padding: 16px; '
-                'border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06)'
-            ):
-                with ui.row().style(
-                    'width: 100%; justify-content: space-between; align-items: center'
-                ):
-                    with ui.column():
-                        ui.label(quiz.title).style(
-                            'font-size: 14px; font-weight: 500; color: #1A1A18'
-                        )
-                        ui.label(quiz.description).style(
-                            'font-size: 12px; color: #666; margin-top: 2px'
-                        )
-                        sc = '#2AF3DE' if quiz.is_published else '#F1EF8'
-                        tc = '#3B6D1' if quiz.is_published else '#444441'
-                        st = 'Veröffentlicht' if quiz.is_published else 'Entwurf'
-                        ui.label(st).style(
-                            f'font-size: 11px; font-weight: 500; '
-                            f'background: {sc}; color: {tc}; '
-                            f'padding: 2px 8px; border-radius: 20px; margin-top: 6px'
-                        )
-                    with ui.column().style('gap: 6px; align-items: flex-end'):
-                        if not quiz.is_published:
-                            def publish(q=quiz):
-                                q.is_published = True
-                                session.add(q)
-                                session.commit()
-                                ui.notify('Quiz veröffentlicht!', color='positive')
-                                ui.navigate.to('/teacher/dashboard')
-                            ui.button('Veröffentlichen',
-                                on_click=publish
-                            ).style(
-                                'background-color: #6B3FA0; color: white; '
-                                'border-radius: 5px; font-size: 12px'
-                            )
-                        ui.button('Resultate',
-                            on_click=lambda q=quiz:
-                                ui.navigate.to(f'/teacher/results/{q.id}')
-                        ).style(
-                            'background: transparent; border: 1px solid #ccc; '
-                            'border-radius: 5px; font-size: 12px'
-                        )
+        # Search input
+        search = ui.input(
+            placeholder='Quiz suchen...'
+        ).style(
+            'width:100%;margin-bottom:16px;border-radius:8px;font-size:13px'
+        )
+
+        # Quiz cards with references for filtering
+        quiz_refs = {}
+
+        with ui.row().style('gap:12px;flex-wrap:wrap') as quiz_grid:
+            for quiz in quizze:
+                with ui.column() as col:
+                    with ui.card().style(
+                        'min-width:280px;flex:1;padding:20px;border-radius:12px'
+                    ):
+                        with ui.row().style(
+                            'width: 100%; justify-content: space-between; align-items: center'
+                        ):
+                            with ui.column():
+                                ui.label(quiz.title).style(
+                                    'font-size: 14px; font-weight: 500; color: #1A1A18'
+                                )
+                                ui.label(quiz.description).style(
+                                    'font-size: 12px; color: #666; margin-top: 2px'
+                                )
+                                sc = '#2AF3DE' if quiz.is_published else '#F1EF8'
+                                tc = '#3B6D1' if quiz.is_published else '#444441'
+                                st = 'Veröffentlicht' if quiz.is_published else 'Entwurf'
+                                ui.label(st).style(
+                                    f'font-size: 11px; font-weight: 500; '
+                                    f'background: {sc}; color: {tc}; '
+                                    f'padding: 2px 8px; border-radius: 20px; margin-top: 6px'
+                                )
+                            with ui.column().style('gap: 6px; align-items: flex-end'):
+                                if not quiz.is_published:
+                                    def publish(q=quiz):
+                                        q.is_published = True
+                                        session.add(q)
+                                        session.commit()
+                                        ui.notify('Quiz veröffentlicht!', color='positive')
+                                        ui.navigate.to('/teacher/dashboard')
+                                    ui.button('Veröffentlichen', on_click=publish).style(
+                                        'background-color: #6B3FA0; color: white; border-radius: 5px; font-size: 12px'
+                                    )
+                                ui.button('Resultate', on_click=lambda q=quiz: ui.navigate.to(f'/teacher/results/{q.id}')).style(
+                                    'background: transparent; border: 1px solid #ccc; border-radius: 5px; font-size: 12px'
+                                )
+                    quiz_refs[quiz.id] = {
+                        'col': col,
+                        'title': quiz.title
+                    }
+
+        # Filter function
+        def filter_quizze():
+            term = search.value.lower()
+            for qid, data in quiz_refs.items():
+                if term in data['title'].lower():
+                    data['col'].style('display:block')
+                else:
+                    data['col'].style('display:none')
+
+        search.on('input', filter_quizze)
