@@ -1,32 +1,49 @@
+"""Demo data seeder for LearnLoop.
+Creates demo users and quizzes with all three question types
+so the application can be tested immediately after setup.
+Demo accounts:
+    Teacher: lehrer / lehrer123
+    Student: schueler / schueler123
+"""
 import hashlib
 from sqlmodel import Session, select
 from domain.models import User, Quiz, Question, AnswerOption
 def hash_password(password: str) -> str:
+    """Hash a password using SHA256.
+    Args:
+        password: Plain text password to hash.
+    Returns:
+        Hexadecimal SHA256 hash string.
+    """
     return hashlib.sha256(password.encode()).hexdigest()
 def seed_data(session: Session) -> None:
+    """Insert demo data into the database if it is empty.
+    Creates two demo users (teacher and student) and two quizzes
+    with all three question types: single, multiple, truefalse.
+    Args:
+        session: Active database session.
+    """
+    # Check if data already exists — skip if so
     existing = session.exec(select(User)).first()
     if existing:
-        return  # Bereits geseedet
+        return
+    # Create demo teacher and student
     lehrer = User(
         username='lehrer',
-        email='lehrer@quiz.ch',
+        email='lehrer@learnloop.ch',
         password_hash=hash_password('lehrer123'),
         role='teacher'
     )
     schueler = User(
         username='schueler',
-        email='schueler@quiz.ch',
+        email='schueler@learnloop.ch',
         password_hash=hash_password('schueler123'),
         role='student'
     )
     session.add(lehrer)
     session.add(schueler)
     session.commit()
-    print('Demo-User erstellt!')
-
-
-    
-     # Demo-Quiz 1: Mathematik
+    # Create Quiz 1: Mathematik with all 3 question types
     quiz1 = Quiz(
         title='Mathematik Grundlagen',
         description='Teste dein Wissen in Mathematik',
@@ -35,7 +52,12 @@ def seed_data(session: Session) -> None:
     )
     session.add(quiz1)
     session.commit()
-    f1 = Question(text='Was ist 2 + 2?', quiz_id=quiz1.id)
+    # Single Choice question — one correct answer
+    f1 = Question(
+        text='Was ist 2 + 2?',
+        quiz_id=quiz1.id,
+        question_type='single'
+    )
     session.add(f1)
     session.commit()
     session.add_all([
@@ -45,23 +67,34 @@ def seed_data(session: Session) -> None:
         AnswerOption(text='6', is_correct=False, question_id=f1.id),
     ])
     session.commit()
-    # Demo-Quiz 2: Englisch
-    quiz2 = Quiz(
-        title='Englisch Vokabeln',
-        description='Wichtige englische Vokabeln',
-        is_published=True,
-        teacher_id=lehrer.id
+    # True/False question — only Wahr/Falsch options
+    f2 = Question(
+        text='10 ist eine gerade Zahl.',
+        quiz_id=quiz1.id,
+        question_type='truefalse'
     )
-    session.add(quiz2)
-    session.commit()
-    f2 = Question(text="Was bedeutet 'apple'?", quiz_id=quiz2.id)
     session.add(f2)
     session.commit()
     session.add_all([
-        AnswerOption(text='Birne', is_correct=False, question_id=f2.id),
-        AnswerOption(text='Apfel', is_correct=True,  question_id=f2.id),
-        AnswerOption(text='Orange',is_correct=False, question_id=f2.id),
-        AnswerOption(text='Traube',is_correct=False, question_id=f2.id),
+        AnswerOption(text='Wahr',   is_correct=True,  question_id=f2.id),
+        AnswerOption(text='Falsch', is_correct=False, question_id=f2.id),
     ])
     session.commit()
-    print('Demo-Quizze erstellt!')
+    # Multiple Choice question — multiple correct answers
+    f3 = Question(
+        text='Welche Zahlen sind Primzahlen?',
+        quiz_id=quiz1.id,
+        question_type='multiple'
+    )
+    session.add(f3)
+    session.commit()
+    session.add_all([
+        AnswerOption(text='2', is_correct=True,  question_id=f3.id),
+        AnswerOption(text='3', is_correct=True,  question_id=f3.id),
+        AnswerOption(text='4', is_correct=False, question_id=f3.id),
+        AnswerOption(text='7', is_correct=True,  question_id=f3.id),
+    ])
+    session.commit()
+    print('LearnLoop demo data created!')
+    print('  Teacher: lehrer / lehrer123')
+    print('  Student: schueler / schueler123')
