@@ -1,0 +1,3 @@
+from services.auth_service import AuthService
+from services.quiz_service import QuizService
+from services.attempt_service import AttemptService
